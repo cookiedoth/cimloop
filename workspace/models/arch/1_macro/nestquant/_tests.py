@@ -1,5 +1,6 @@
 import sys
 import os
+import shutil
 
 # fmt: off
 THIS_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -9,31 +10,27 @@ from scripts import utils as utl
 import scripts
 # fmt: on
 
-def test_area_energy_breakdown():
+def test_area_energy_breakdown(arch, layer):
     """
-    ### Area and energy breakdown
-    This example architecture doesn't have a suite of tests, but you may
-    look at the other example architectures for inspiration.        
     """
     # results = utl.single_test(utl.quick_run(macro=MACRO_NAME))
-    layer_path = utl.path_from_model_dir(f"workloads/llm/gemm.yaml")
+    layer_path = utl.path_from_model_dir(layer)
+    arch_target = os.path.join(THIS_SCRIPT_DIR, "arch.yaml")
+    arch_src = os.path.join(THIS_SCRIPT_DIR, f"arch_{arch}.yaml")
+    assert os.path.exists(arch_src)
+    shutil.copy(arch_src, arch_target)
     print("Running on layer", layer_path)
+    print("Architecture is taken from", arch_src)
 
-    results = utl.parallel_test(
-        utl.delayed(utl.run_layer)(
-            macro=MACRO_NAME,
-            system="_none",
-            layer=layer_path,
-            variables=dict(
-                QUANTIZE=q,
-            
-            ),
-        )
-        for q in [False, True]
+    result = utl.run_layer(
+        macro=MACRO_NAME,
+        system="_none",
+        layer=layer_path
     )
-    results.clear_zero_areas()
-    results.clear_zero_energies()
-    return results
+
+    result.clear_zero_areas()
+    result.clear_zero_energies()
+    return result
 
 if __name__ == "__main__":
     test_area_energy_breakdown()

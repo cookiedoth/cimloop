@@ -44,14 +44,6 @@ architecture:
         factors: [N=1, C=1, P=1, R=1, S=1]
         split: 999
 
-  - !Component
-    name: weight_quantize
-    <<<: [*component_defaults, *keep_weights, *no_coalesce]
-    subclass: weight_quantizer
-    attributes:
-      width: 32
-      depth: INF
-
   - !Container # Each PE in the column receives a different filter row
     name: PE
     spatial: {meshY: 8}
@@ -60,6 +52,14 @@ architecture:
         split: 0
         factors: [N=1, P=1, Q=1, R=1]
     max_utilization: {spatial: {factors: [('C=' + str(PE.get_fanout()))]}}
+
+  - !Component
+    name: weight_quantize
+    <<<: [*component_defaults, *keep_weights, *no_coalesce]
+    subclass: weight_quantizer
+    attributes:
+      width: 32
+      depth: INF
 
   - !Component # Input scratchpad
     name: ifmap_spad

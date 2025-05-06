@@ -44,14 +44,6 @@ architecture:
         factors: [N=1, C=1, P=1, R=1, S=1]
         split: 999
 
-  - !Component
-    name: weight_quantize
-    <<<: [*component_defaults, *keep_weights, *no_coalesce]
-    subclass: weight_quantizer
-    attributes:
-      width: 32
-      depth: INF
-
   - !Container # Each PE in the column receives a different filter row
     name: PE
     spatial: {meshY: 8}
@@ -83,7 +75,7 @@ architecture:
     attributes:
       depth: 192
       width: 16
-      datawidth: 2
+      datawidth: 1
       read_bandwidth: 16 # bits/cycle
       write_bandwidth: 16 # bits/cycle
     constraints:
@@ -105,6 +97,14 @@ architecture:
       temporal:
         permutation: [N, C, P, Q, R, S, M] 
         factors: [N=1, C=1, R=1, S=1, P=1, Q=1]
+
+  - !Component
+    name: weight_quantize
+    <<<: [*component_defaults, *keep_weights, *no_coalesce]
+    subclass: weight_quantizer
+    attributes:
+      width: 32
+      depth: INF
 
   - !Hierarchical           # Virtualize an XxYxZ-bit MAC as multiple MAC units.
     nodes: *virtualized_mac_without_mac_unit # Defined in include/defines.yaml.

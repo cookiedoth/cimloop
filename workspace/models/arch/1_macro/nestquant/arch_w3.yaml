@@ -34,6 +34,15 @@ architecture:
       read_bandwidth: 128 # bits/cycle
       write_bandwidth: 128 # bits/cycle
       datawidth: 1
+
+  - !Component
+    name: weight_quantize
+    <<<: [*component_defaults, *keep_weights, *no_coalesce]
+    subclass: weight_quantizer
+    attributes:
+      width: 32
+      depth: INF
+
   - !Container # Each column stores a different weight slice. Columns share inputs.
     name: PE_column
     <<<: [*container_defaults, *spatial_must_reuse_inputs]
@@ -43,14 +52,6 @@ architecture:
       spatial:
         factors: [N=1, C=1, P=1, R=1, S=1]
         split: 999
-
-  - !Component
-    name: weight_quantize
-    <<<: [*component_defaults, *keep_weights, *no_coalesce]
-    subclass: weight_quantizer
-    attributes:
-      width: 32
-      depth: INF
 
   - !Container # Each PE in the column receives a different filter row
     name: PE
