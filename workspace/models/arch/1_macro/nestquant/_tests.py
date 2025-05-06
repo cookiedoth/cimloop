@@ -21,11 +21,15 @@ def test_area_energy_breakdown(arch, layer):
     shutil.copy(arch_src, arch_target)
     print("Running on layer", layer_path)
     print("Architecture is taken from", arch_src)
+    # print("Quant_w is", quant_w)
 
     result = utl.run_layer(
         macro=MACRO_NAME,
         system="_none",
-        layer=layer_path
+        layer=layer_path,
+        # variables={
+        #    "ENCODED_WEIGHT_BITS": (4 if quant_w else 8)
+        # }
     )
 
     result.clear_zero_areas()

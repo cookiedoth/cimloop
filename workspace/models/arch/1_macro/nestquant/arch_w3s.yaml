@@ -24,16 +24,37 @@ architecture:
   
 
   - !Component # Global buffer for inputs & outputs
-    name: shared_glb
-    <<<: [*component_defaults, *keep_inputs, *keep_outputs, *keep_weights]
+    name: shared_glb_w
+    <<<: [*component_defaults,  *keep_weights]
     subclass: smartbuffer_sram
     attributes:
-      depth: 16384
+      depth: 14336
       width: 64
       n_banks: 32
       read_bandwidth: 128 # bits/cycle
       write_bandwidth: 128 # bits/cycle
       datawidth: 1
+
+  - !Component # Global buffer for inputs & outputs
+    name: shared_glb_io
+    <<<: [*component_defaults, *keep_inputs, *keep_outputs]
+    subclass: smartbuffer_sram
+    attributes:
+      depth: 1024
+      width: 64
+      n_banks: 32
+      read_bandwidth: 128 # bits/cycle
+      write_bandwidth: 128 # bits/cycle
+      datawidth: 1
+
+  - !Component
+    name: weight_quantize
+    <<<: [*component_defaults, *keep_weights, *no_coalesce]
+    subclass: weight_quantizer
+    attributes:
+      width: 32
+      depth: INF
+
   - !Container # Each column stores a different weight slice. Columns share inputs.
     name: PE_column
     <<<: [*container_defaults, *spatial_must_reuse_inputs]
@@ -75,7 +96,7 @@ architecture:
     attributes:
       depth: 192
       width: 16
-      datawidth: 1
+      datawidth: 2
       read_bandwidth: 16 # bits/cycle
       write_bandwidth: 16 # bits/cycle
     constraints:

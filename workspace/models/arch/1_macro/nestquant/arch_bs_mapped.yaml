@@ -16,6 +16,10 @@ architecture:
       type: "LPDDR4"
       width: 64
       depth: INF
+    constraints:
+      temporal:
+        permutation: [C, P, M, N, Q, R, S]
+        factors: [N=1, M=4, C=64, P=16, Q=1, R=1, S=1]
 
   
 
@@ -34,6 +38,10 @@ architecture:
       read_bandwidth: 128 # bits/cycle
       write_bandwidth: 128 # bits/cycle
       datawidth: 1
+    constraints:
+      temporal:
+        permutation: [C, P, M, N, Q, R, S]
+        factors: [N=1, M=8, C=1, P=128, Q=1, R=1, S=1]
   - !Container # Each column stores a different weight slice. Columns share inputs.
     name: PE_column
     <<<: [*container_defaults, *spatial_must_reuse_inputs]
@@ -41,7 +49,8 @@ architecture:
     max_utilization: {spatial: {factors: [('M=' + str(PE_column.get_fanout()))]}}
     constraints:
       spatial:
-        factors: [N=1, C=1, P=1, R=1, S=1]
+        permutation: [C, P, M, N, Q, R, S]
+        factors: [N=1, C=1, P=1, R=1, S=1, M=4, Q=1]
         split: 999
 
   - !Container # Each PE in the column receives a different filter row
@@ -50,7 +59,8 @@ architecture:
     constraints:
       spatial:
         split: 0
-        factors: [N=1, P=1, Q=1, R=1]
+        permutation: [C, P, M, N, Q, R, S]
+        factors: [N=1, P=1, Q=1, R=1, S=1, C=2, M=4]
     max_utilization: {spatial: {factors: [('C=' + str(PE.get_fanout()))]}}
 
   - !Component # Input scratchpad
@@ -81,7 +91,7 @@ architecture:
     constraints:
       temporal:
         permutation: [N, M, P, Q, S, C, R]
-        factors: [N=1, M=1, P=1, Q=1, S=1]
+        factors: [N=1, M=1, P=1, Q=1, S=1, C=16, R=1]
 
   - !Component # Output scratchpad
     name: psum_spad
@@ -96,7 +106,7 @@ architecture:
     constraints:
       temporal:
         permutation: [N, C, P, Q, R, S, M] 
-        factors: [N=1, C=1, R=1, S=1, P=1, Q=1]
+        factors: [N=1, C=1, R=1, S=1, P=1, Q=1, M=4]
 
   - !Hierarchical           # Virtualize an XxYxZ-bit MAC as multiple MAC units.
     nodes: *virtualized_mac_without_mac_unit # Defined in include/defines.yaml.

@@ -1,10 +1,10 @@
 mapper:
   version: 0.4
   optimization_metrics: [ edp ]
-  live_status: False
+  live_status: True
   num_threads: 1
-  search_size: 10000          # Max valid mappings per-thread
-  victory_condition: 100      # Exit once a mapping is better than this number of
+  search_size: 30000          # Max valid mappings per-thread
+  victory_condition: 200      # Exit once a mapping is better than this number of
                               # valid mappings in a row
   timeout: 10000              # Max invalid mappings in a row
   max_permutations_per_if_visit: 16
