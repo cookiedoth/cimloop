@@ -1,0 +1,41 @@
+inter_macro_in_system_spatial [ ] 
+---------------------------------
+| for C in [0:128) (Spatial-X)
+
+DRAM [ Weights:131072 (131072) Inputs:262144 (262144) Outputs:33554432 (33554432) ] 
+-----------------------------------------------------------------------------------
+|   for P in [0:256)
+
+shared_glb [ Weights:131072 (131072) Inputs:1024 (1024) Outputs:131072 (131072) ] 
+---------------------------------------------------------------------------------
+|     for M in [0:128)
+|       for C in [0:4)
+|         for P in [0:8)
+
+inter_PE_column_spatial [ ] 
+---------------------------
+|           for M in [0:4) (Spatial-X)
+
+inter_PE_spatial [ ] 
+--------------------
+|             for M in [0:2) (Spatial-Y)
+|               for C in [0:2) (Spatial-Y)
+
+ifmap_spad [ Inputs:16 (16) ] 
+weights_spad [ Weights:16 (16) ] 
+--------------------------------
+|                 for C in [0:2)
+
+psum_spad [ Outputs:16 (16) ] 
+-----------------------------
+|                   for M in [0:2)
+
+inter_1bit_x_1bit_mac_spatial [ ] 
+---------------------------------
+|                     for Z in [0:8) (Spatial-X)
+|                       for Y in [0:4) (Spatial-X)
+|                         for X in [0:8) (Spatial-X)
+
+here_to_fix_a_bug [ ] 
+---------------------
+|                           << Compute >>

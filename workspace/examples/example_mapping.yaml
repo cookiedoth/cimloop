@@ -1,0 +1,36 @@
+mapping:
+  # Memory level
+  - target: DRAM
+    type: temporal
+    factors: C=1 K=16 R=1 S=1 P=7 Q=7 N=1
+    permutation: KQPNRSC
+
+  # Global buffer level
+  - target: GlobalBuffer
+    type: temporal
+    factors: C=32 K=2 R=3 S=3 P=1 Q=1 N=1
+    permutation: SRCKQPN
+    
+  # RegisterFile level
+  - target: RegisterFile
+    type: temporal
+    factors: C=1 K=1 R=1 S=1 P=8 Q=8 N=1
+    permutation: QPNSKRC
+    
+  # PE level 
+  - target: SRAM
+    type: spatial
+    factors: C=4 K=4 R=1 S=1 P=1 Q=1 N=1
+    permutation: KCQPNRS
+    split: 1
+  
+  # Bypass directives
+  - target: DRAM
+    type: bypass
+    bypass: [Inputs, Weights]
+    keep: [Outputs]
+    
+  - target: GlobalBuffer
+    type: bypass
+    bypass: []
+    keep: [Inputs, Weights, Outputs] 
